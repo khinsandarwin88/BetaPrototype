@@ -348,7 +348,7 @@
                 if (!response.ok) throw new Error(`API call failed: ${response.status}`);
                 const result = await response.json();
                 removeLoadingMessage();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text.replace(/\n/g, '<br>') || t('apiError');
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || t('apiError');
             } catch (error) {
                 console.error("Gemini API Error:", error);
                 removeLoadingMessage();
@@ -414,7 +414,7 @@
             const course = conversationState.selectedCourse;
             const prompt = `You are an AI Concierge for a Thai language school. A student is enrolling in "${course.name.en}". Generate a short, exciting, and personalized (2-3 sentences) welcome message for them in ${currentLanguage}, highlighting one fun aspect of their upcoming learning journey based on: "${course.teaching.en}".`;
             const personalizedMessage = await callGeminiAPI(prompt);
-            appendMessage('ai', personalizedMessage);
+            appendMessage('ai', personalizedMessage.replace(/\n/g, '<br>'));
             appendMessage('ai', t('enrollSoon'));
             addButton('startOver', startConversation);
         }
@@ -476,11 +476,13 @@
             
             const prompt = `You are an AI Thai language tutor. Generate one unique, multiple-choice question to test a student's ${difficulty} level knowledge of Thai. The question should be about either vocabulary or simple grammar. Provide the question in English. Provide four possible answers in Thai script with English transliterations. Return ONLY a valid JSON object with the keys "question", "options" (an array of 4 strings), and "correctAnswer" (the index of the correct option, 0-3).`;
             
-            const jsonString = await callGeminiAPI(prompt);
+            const rawResponse = await callGeminiAPI(prompt);
             
             try {
-                const cleanedJson = jsonString.replace(/```json|```|<br>/g, '').trim();
-                const questionData = JSON.parse(cleanedJson);
+                const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error("No JSON object found in the response.");
+                
+                const questionData = JSON.parse(jsonMatch[0]);
                 let questionHtml = `<div class="card"><h3>Question ${questionNumber}/${totalQuestions}</h3><p>${questionData.question}</p></div>`;
                 appendMessage('ai', questionHtml);
                 clearInputArea();
@@ -492,7 +494,7 @@
                     userInputArea.appendChild(button);
                 });
             } catch (error) {
-                console.error("Failed to parse question JSON:", error, "Raw response:", jsonString);
+                console.error("Failed to parse question JSON:", error, "Raw response:", rawResponse);
                 appendMessage('ai', t('apiError'));
                 addButton('mainMenu', startConversation);
             }
@@ -537,16 +539,18 @@
             
             const prompt = `You are a Thai local role-playing with a language student. The scenario is "${scenario}". Start the conversation by saying something a local would say in Thai. Provide the Thai script, an English transliteration, and a simple English translation. Return ONLY a valid JSON object with keys "thai_script", "transliteration", and "translation".`;
 
-            const jsonString = await callGeminiAPI(prompt);
+            const rawResponse = await callGeminiAPI(prompt);
             try {
-                const cleanedJson = jsonString.replace(/```json|```|<br>/g, '').trim();
-                const convoData = JSON.parse(cleanedJson);
+                const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error("No JSON object found in the response.");
+
+                const convoData = JSON.parse(jsonMatch[0]);
                 const convoHtml = `<div class="card"><p><em>${convoData.thai_script}</em><br>(${convoData.transliteration})<br>"${convoData.translation}"</p></div>`;
                 appendMessage('ai', convoHtml);
                 addButton('howToReply', () => appendMessage('ai', `<div class="card"><p>${t('replySuggestion')}</p></div>`));
                 addButton('mainMenu', startConversation);
             } catch (error) {
-                console.error("Failed to parse scenario JSON:", error, "Raw response:", jsonString);
+                console.error("Failed to parse scenario JSON:", error, "Raw response:", rawResponse);
                 appendMessage('ai', t('apiError'));
                 addButton('mainMenu', startConversation);
             }
@@ -584,7 +588,7 @@
             appendMessage('user', userQuestion);
             const prompt = `You are a friendly and helpful AI Concierge for the "OKay Thai Language Center" and an expert on Thai culture. A user asked: "${userQuestion}". Answer the question in ${currentLanguage}. If the question is about the language center (courses, prices, lecturers), use the provided internal data. If the question is about Thai culture, festivals, food, or etiquette, use your general knowledge to provide a helpful and engaging answer. Internal Data: Courses: Normal, Children, Basic Speaking, Private classes online. Prices: Basic courses start at MMK 149,000. Lecturers: All are experienced Myanmar nationals. Location: All classes are online.`;
             const aiResponse = await callGeminiAPI(prompt);
-            appendMessage('ai', aiResponse);
+            appendMessage('ai', aiResponse.replace(/\n/g, '<br>'));
             appendMessage('ai', t('anythingElse'));
             addButton('askAnother', () => handleFreeformQuestion());
             addButton('mainMenu', startConversation);
