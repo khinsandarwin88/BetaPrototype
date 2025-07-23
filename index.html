@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OKay Thai Bot - AI Concierge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lexend:wght@400;600&family=Pacifico&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --font-main: 'Poppins', sans-serif;
+            --font-fancy: 'Pacifico', cursive;
+            --font-bold: 'Montserrat', sans-serif;
             --border-radius: 16px;
         }
 
@@ -15,15 +17,154 @@
         body.theme-default {
             --bg-gradient: linear-gradient(160deg, #19162c 0%, #3c2f5f 100%);
             --bg-chat-window: rgba(25, 22, 44, 0.85);
-            --border-glow: rgba(169, 137, 255, 0.3);
-            --accent-glow: #a989ff;
-            --accent-secondary: #00f6ff;
-            --text-primary: #f0f0f5;
-            --text-secondary: #a7a1c4;
-            --user-bubble-bg: linear-gradient(145deg, #6c56c2, #4c3d8f);
+            --border-glow: rgba(255, 221, 51, 0.35); /* yellow glow */
+            --accent-glow: #ffe066; /* yellow accent */
+            --accent-secondary: #fff200; /* strong yellow */
+            --text-primary: #fffbe6; /* soft yellowish white */
+            --text-secondary: #ffe066;
+            --user-bubble-bg: linear-gradient(145deg, #ffe066 60%, #fff200 100%);
             --ai-bubble-bg: #2a2540;
-            --button-bg: rgba(169, 137, 255, 0.1);
-            --button-hover-bg: rgba(169, 137, 255, 0.2);
+            --button-bg: linear-gradient(90deg, #ffe066 60%, #fff200 100%);
+            --button-hover-bg: linear-gradient(90deg, #fff200 60%, #ffe066 100%);
+        }
+        body.theme-default .header-title h1 {
+            font-family: var(--font-fancy);
+            font-size: 2.2rem;
+            color: var(--accent-secondary);
+            text-shadow: 0 0 18px var(--accent-glow), 0 2px 8px #fff200;
+            letter-spacing: 2px;
+            animation: floatTitle 2.5s infinite ease-in-out;
+        }
+        @keyframes floatTitle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        body.theme-default .header-title p {
+            color: var(--accent-glow);
+            font-family: var(--font-bold);
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+        }
+        body.theme-default .action-button {
+            font-family: var(--font-bold);
+            background: var(--button-bg);
+            color: #19162c;
+            border: 2px solid var(--accent-secondary);
+            box-shadow: 0 0 12px var(--accent-glow), 0 2px 8px #fff200;
+            font-size: 1.1rem;
+            transition: all 0.25s cubic-bezier(.68,-0.55,.27,1.55), box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        body.theme-default .action-button:hover {
+            background: var(--button-hover-bg);
+            color: #19162c;
+            box-shadow: 0 0 24px var(--accent-secondary), 0 4px 16px #ffe066;
+            transform: translateY(-3px) scale(1.07) rotate(-2deg);
+            text-shadow: 0 0 8px #fff200;
+        }
+        body.theme-default .action-button:active {
+            transform: scale(0.97);
+            box-shadow: 0 0 8px var(--accent-secondary);
+        }
+        body.theme-default .avatar {
+            background: var(--accent-secondary);
+            color: #19162c;
+            box-shadow: 0 0 16px var(--accent-glow), 0 2px 8px #fff200;
+            font-size: 2rem;
+            font-family: var(--font-fancy);
+            border: 2px solid #ffe066;
+        }
+        body.theme-default .ai .avatar {
+            background: #ffe066;
+            color: #19162c;
+            box-shadow: 0 0 16px #fff200;
+        }
+        body.theme-default .user .avatar {
+            background: #fff200;
+            color: #19162c;
+            box-shadow: 0 0 16px #ffe066;
+        }
+        body.theme-default .message-content {
+            font-family: var(--font-main);
+            font-size: 1.08rem;
+            color: var(--text-primary);
+            background: var(--ai-bubble-bg);
+            border: 2px solid var(--accent-glow);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: box-shadow 0.2s;
+        }
+        body.theme-default .user .message-content {
+            background: var(--user-bubble-bg);
+            color: #19162c;
+            font-family: var(--font-bold);
+            box-shadow: 0 0 18px #fff200;
+        }
+        body.theme-default .chat-message {
+            animation: slideIn 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        body.theme-default .card {
+            background: linear-gradient(135deg, #fffbe6 80%, #ffe066 100%);
+            border: 2px solid #ffe066;
+            color: #19162c;
+            font-family: var(--font-main);
+            box-shadow: 0 0 18px #ffe066;
+        }
+        body.theme-default .card h3 {
+            font-family: var(--font-fancy);
+            color: #fff200;
+            text-shadow: 0 0 8px #ffe066;
+            font-size: 1.3rem;
+        }
+        body.theme-default .card strong {
+            color: #19162c;
+            font-family: var(--font-bold);
+        }
+        body.theme-default .settings-btn {
+            color: #fff200;
+            text-shadow: 0 0 8px #ffe066;
+            font-size: 2.2rem;
+            transition: transform 0.2s, color 0.2s;
+        }
+        body.theme-default .settings-btn:hover {
+            color: #ffe066;
+            transform: scale(1.15) rotate(-8deg);
+        }
+        body.theme-default #chat-log::-webkit-scrollbar-thumb {
+            background: #ffe066;
+        }
+        body.theme-default #chat-log::-webkit-scrollbar-thumb:hover {
+            background: #fff200;
+        }
+        body.theme-default .option-btn {
+            background: var(--button-bg);
+            color: #19162c;
+            border: 2px solid #ffe066;
+            font-family: var(--font-bold);
+            font-size: 1rem;
+            box-shadow: 0 0 8px #ffe066;
+            transition: all 0.2s;
+        }
+        body.theme-default .option-btn.active {
+            background: #fff200;
+            color: #19162c;
+            box-shadow: 0 0 16px #ffe066;
+        }
+        body.theme-default .option-btn:hover {
+            background: #ffe066;
+            color: #19162c;
+            transform: scale(1.08);
+        }
+        body.theme-default #freeform-input {
+            background: #fffbe6;
+            color: #19162c;
+            border: 2px solid #ffe066;
+            font-family: var(--font-main);
+            font-size: 1.08rem;
+        }
+        body.theme-default #freeform-input:focus {
+            border-color: #fff200;
+            box-shadow: 0 0 8px #ffe066;
         }
 
         /* --- THEME: High Contrast (Color-Blind Friendly) --- */
