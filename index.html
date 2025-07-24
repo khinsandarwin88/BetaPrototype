@@ -1,151 +1,22 @@
-<!-- Enhanced OKay Thai AI Concierge Web App -->
-<!-- Includes full logic: multi-language support, theme selector, course selection, lecturer info, placement test, and Google Sheets integration -->
+<!-- Full HTML remains unchanged up to existing <script> section -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OKay Thai - AI Concierge</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-    :root {
-      --bg-main: #19162c;
-      --bg-alt: #3c2f5f;
-      --text-color: #fffbe6;
-      --accent: #fff200;
-    }
-    [data-theme="dark"] {
-      --bg-main: #0d0d0d;
-      --bg-alt: #1a1a1a;
-      --text-color: #ffffff;
-      --accent: #e60000;
-    }
-    [data-theme="colorblind"] {
-      --bg-main: #222;
-      --bg-alt: #444;
-      --text-color: #f0f0f0;
-      --accent: #ff8c00;
-    }
-    [data-theme="autism"] {
-      --bg-main: #002244;
-      --bg-alt: #003366;
-      --text-color: #ffffff;
-      --accent: #00ccff;
-    }
-    [data-theme="pride"] {
-      --bg-main: #1a1a1a;
-      --bg-alt: #333;
-      --text-color: #fff;
-      --accent: linear-gradient(to right, red, orange, yellow, green, blue, violet);
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(160deg, var(--bg-main), var(--bg-alt));
-      color: var(--text-color);
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    header {
-      text-align: center;
-      padding: 2rem 1rem;
-    }
-    header h1 {
-      font-size: 2.2rem;
-      color: var(--accent);
-    }
-    .chat-container {
-      background: rgba(25, 22, 44, 0.85);
-      border-radius: 16px;
-      box-shadow: 0 0 20px var(--accent);
-      max-width: 800px;
-      width: 100%;
-      padding: 1rem;
-      margin: 1rem;
-    }
-    .input-area, .lead-form, .settings-area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 1rem;
-      justify-content: center;
-    }
-    .action-button {
-      padding: 0.75rem 1.25rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      color: #19162c;
-      cursor: pointer;
-      box-shadow: 0 0 10px var(--accent);
-      transition: transform 0.2s ease;
-    }
-    .action-button:hover {
-      transform: scale(1.05);
-    }
-    input, select {
-      padding: 0.5rem;
-      border-radius: 8px;
-      border: 1px solid var(--accent);
-      flex: 1 1 45%;
-    }
-    .message {
-      margin: 0.5rem 0;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>OKay Thai AI Concierge</h1>
-    <p id="greeting">Helping Myanmar Students Learn Thai — Smarter</p>
-  </header>
+<!-- Add to your HTML before <script> -->
+<div class="input-area">
+  <button class="action-button" onclick="startTest()">🧠 Placement Test</button>
+  <button class="action-button" onclick="showLeadForm()">📋 Enroll Now</button>
+  <button class="action-button" onclick="readText()">🔊 Hear Thai Greeting</button>
+  <button class="action-button" onclick="showCourseList()">📚 Browse Courses</button>
+  <button class="action-button" onclick="showLecturers()">👩‍🏫 Meet Lecturers</button>
+  <button class="action-button" onclick="showSampleVideo()">🎥 Watch Sample Class</button>
+</div>
 
-  <div class="settings-area">
-    <select onchange="setLanguage(this.value)">
-      <option value="en">English</option>
-      <option value="mm">Myanmar</option>
-      <option value="th">Thai</option>
-    </select>
-    <select onchange="setTheme(this.value)">
-      <option value="default">Main Theme</option>
-      <option value="dark">Dark Theme</option>
-      <option value="colorblind">Color Blind</option>
-      <option value="autism">Autism Friendly</option>
-      <option value="pride">Pride Theme</option>
-    </select>
-  </div>
+<div id="video-container" style="display:none; text-align:center; margin-top:1rem;">
+  <p>👩‍🏫 Here's a sample from our Thai language class:</p>
+  <iframe width="100%" height="315" src="https://youtube.com/shorts/sLUGhhrO4SM?si=jn5sDfCXWjFoukQg" 
+    title="AI Thai Class Sample" frameborder="0" allowfullscreen></iframe>
+</div>
 
-  <section class="chat-container">
-    <div id="chat-log">
-      <div class="message" id="welcome-msg"></div>
-    </div>
-
-    <div class="input-area">
-      <button class="action-button" onclick="startTest()">🧠 Placement Test</button>
-      <button class="action-button" onclick="showLeadForm()">📋 Enroll Now</button>
-      <button class="action-button" onclick="readText()">🔊 Hear Thai Greeting</button>
-      <button class="action-button" onclick="showCourseList()">📚 Browse Courses</button>
-      <button class="action-button" onclick="showLecturers()">👩‍🏫 Meet Lecturers</button>
-    </div>
-
-    <form id="lead-form" class="lead-form" style="display:none;">
-      <input type="text" id="name" placeholder="Your Name" required />
-      <input type="text" id="contact" placeholder="Facebook/Telegram/Viber" required />
-      <select id="interest">
-        <option>Basic Thai</option>
-        <option>Speaking Only</option>
-        <option>Children Class</option>
-        <option>Private 1:1</option>
-      </select>
-      <button type="submit" class="action-button">Submit Lead</button>
-    </form>
-  </section>
-
-  <script>
+<script>
   const chatLog = document.getElementById('chat-log');
   const welcomeMsg = document.getElementById('welcome-msg');
 
@@ -197,6 +68,11 @@
 
   function showLecturers() {
     appendMessage("👩‍🏫 TR. ZAW — 5 years teaching experience.\n👩‍🏫 TR. PHYU — Translator at Toyota, 2 years teaching.\n👩‍🏫 TR. MAY — Fluent in Thai, 3 years in Thai Company.");
+  }
+
+  function showSampleVideo() {
+    document.getElementById('video-container').style.display = 'block';
+    appendMessage("🎥 Playing AI-generated class sample. Watch and enjoy!");
   }
 
   // Full Placement Test Logic
@@ -283,7 +159,7 @@
   function showResult() {
     const level = score >= 4 ? 'Advanced' : score >= 2 ? 'Intermediate' : 'Beginner';
     appendMessage(`🎉 You scored ${score}/${testQuestions.length}. Recommended level: **${level}**.`);
-    appendMessage(`📥 Would you like to enroll in a class? Click "Enroll Now" to get started.`);
+    appendMessage(`📥 Would you like to enroll in a class? Click \"Enroll Now\" to get started.`);
   }
 
   document.getElementById('lead-form').addEventListener('submit', function(e) {
