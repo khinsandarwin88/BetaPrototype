@@ -1,5 +1,5 @@
 <!-- Enhanced OKay Thai AI Concierge Web App -->
-<!-- Includes lead capture, CRM tagging, test gamification, voice input/output -->
+<!-- Merged with full logic: multi-language, themes, course selection, lecturer info, placement test -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OKay Thai - AI Concierge</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -75,13 +76,15 @@
 
   <section class="chat-container">
     <div id="chat-log">
-      <div class="message">🤖 Welcome! Let me help you find the right Thai course.</div>
+      <div class="message">🤖 สวัสดีค่ะ (Sawasdee ka!) Welcome! I am your AI Concierge for the OKay Thai Language Center. How can I help you today?</div>
     </div>
 
     <div class="input-area">
       <button class="action-button" onclick="startTest()">🧠 Placement Test</button>
       <button class="action-button" onclick="showLeadForm()">📋 Enroll Now</button>
       <button class="action-button" onclick="readText()">🔊 Hear Thai Greeting</button>
+      <button class="action-button" onclick="showCourseList()">📚 Browse Courses</button>
+      <button class="action-button" onclick="showLecturers()">👩‍🏫 Meet Lecturers</button>
     </div>
 
     <form id="lead-form" class="lead-form" style="display:none;">
@@ -100,13 +103,35 @@
   <script>
     const chatLog = document.getElementById('chat-log');
 
-    function startTest() {
-      chatLog.innerHTML += '<div class="message">🤖 Question 1: What does "สวัสดี" mean?</div>';
-      chatLog.innerHTML += '<div class="message">👤 A. Goodbye | B. Thank you | C. Hello | D. Please</div>';
+    function appendMessage(message, sender = 'ai') {
+      const div = document.createElement('div');
+      div.className = 'message';
+      div.innerHTML = `${sender === 'ai' ? '🤖' : '👤'} ${marked.parseInline(message)}`;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
     }
 
     function showLeadForm() {
       document.getElementById('lead-form').style.display = 'flex';
+    }
+
+    function readText() {
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance('สวัสดีค่ะ');
+      utter.lang = 'th-TH';
+      synth.speak(utter);
+    }
+
+    function showCourseList() {
+      appendMessage("We offer: 1. Thai Speaking Only, 2. 4-skills Thai Class, 3. One-on-One, 4. Children’s Group Class, 5. Private Group Class.");
+    }
+
+    function showLecturers() {
+      appendMessage("👩‍🏫 TR. ZAW — 5 years teaching experience.\n👩‍🏫 TR. PHYU — Translator at Toyota, 2 years teaching.\n👩‍🏫 TR. MAY — Fluent in Thai, 3 years in Thai Company.");
+    }
+
+    function startTest() {
+      appendMessage("Question 1: What does \"สวัสดี\" mean?\nA. Goodbye | B. Thank you | C. Hello | D. Please");
     }
 
     document.getElementById('lead-form').addEventListener('submit', function(e) {
@@ -117,15 +142,14 @@
 
       const payload = { name, contact, interest };
 
-      fetch('https://script.google.com/macros/s/AKfycbxkX1OmhdUuwcrGgFRmX07FOl7CqeTF_HTJv__A1WmOeVVWde1Q7_zwd7FzPuTck1PQFQ/exec', {
+      fetch('YOUR_WEB_APP_URL_HERE', {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
       })
       .then(res => res.json())
       .then(data => {
-        console.log('Lead saved:', data);
-        chatLog.innerHTML += `<div class="message">🤖 Thanks, ${name}! We saved your interest in ${interest}. Our team will contact you soon.</div>`;
+        appendMessage(`Thanks, ${name}! We saved your interest in ${interest}. Our team will contact you soon.`);
         document.getElementById('lead-form').reset();
         document.getElementById('lead-form').style.display = 'none';
       })
@@ -134,13 +158,6 @@
         alert('There was a problem saving your lead. Try again.');
       });
     });
-
-    function readText() {
-      const synth = window.speechSynthesis;
-      const utter = new SpeechSynthesisUtterance('สวัสดีค่ะ');
-      utter.lang = 'th-TH';
-      synth.speak(utter);
-    }
   </script>
 </body>
 </html>
