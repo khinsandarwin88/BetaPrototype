@@ -484,7 +484,7 @@
         async function callGeminiAPI(prompt) {
             appendMessage('ai', t('thinking'), true);
             clearInputArea();
-            const apiKey = "";
+            const apiKey = "AIzaSyDEh-gYJQfZHjRBm2L6S6iueEObfLuZNIk";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             try {
