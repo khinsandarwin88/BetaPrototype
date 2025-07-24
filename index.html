@@ -1,5 +1,5 @@
 <!-- Enhanced OKay Thai AI Concierge Web App -->
-<!-- Merged with full logic: multi-language, themes, course selection, lecturer info, placement test -->
+<!-- Includes full logic: multi-language support, theme selector, course selection, lecturer info, placement test, and Google Sheets integration -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,10 +10,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
+    :root {
+      --bg-main: #19162c;
+      --bg-alt: #3c2f5f;
+      --text-color: #fffbe6;
+      --accent: #fff200;
+    }
+    [data-theme="dark"] {
+      --bg-main: #0d0d0d;
+      --bg-alt: #1a1a1a;
+      --text-color: #ffffff;
+      --accent: #e60000;
+    }
+    [data-theme="colorblind"] {
+      --bg-main: #222;
+      --bg-alt: #444;
+      --text-color: #f0f0f0;
+      --accent: #ff8c00;
+    }
+    [data-theme="autism"] {
+      --bg-main: #002244;
+      --bg-alt: #003366;
+      --text-color: #ffffff;
+      --accent: #00ccff;
+    }
+    [data-theme="pride"] {
+      --bg-main: #1a1a1a;
+      --bg-alt: #333;
+      --text-color: #fff;
+      --accent: linear-gradient(to right, red, orange, yellow, green, blue, violet);
+    }
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(160deg, #19162c, #3c2f5f);
-      color: #fffbe6;
+      background: linear-gradient(160deg, var(--bg-main), var(--bg-alt));
+      color: var(--text-color);
       margin: 0;
       display: flex;
       flex-direction: column;
@@ -25,18 +55,18 @@
     }
     header h1 {
       font-size: 2.2rem;
-      color: #fff200;
+      color: var(--accent);
     }
     .chat-container {
       background: rgba(25, 22, 44, 0.85);
       border-radius: 16px;
-      box-shadow: 0 0 20px #ffe066;
+      box-shadow: 0 0 20px var(--accent);
       max-width: 800px;
       width: 100%;
       padding: 1rem;
       margin: 1rem;
     }
-    .input-area, .lead-form {
+    .input-area, .lead-form, .settings-area {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -45,13 +75,13 @@
     }
     .action-button {
       padding: 0.75rem 1.25rem;
-      background: linear-gradient(90deg, #ffe066, #fff200);
+      background: var(--accent);
       border: none;
       border-radius: 12px;
       font-weight: 600;
       color: #19162c;
       cursor: pointer;
-      box-shadow: 0 0 10px #fff200;
+      box-shadow: 0 0 10px var(--accent);
       transition: transform 0.2s ease;
     }
     .action-button:hover {
@@ -60,7 +90,7 @@
     input, select {
       padding: 0.5rem;
       border-radius: 8px;
-      border: 1px solid #ffe066;
+      border: 1px solid var(--accent);
       flex: 1 1 45%;
     }
     .message {
@@ -71,12 +101,27 @@
 <body>
   <header>
     <h1>OKay Thai AI Concierge</h1>
-    <p>Helping Myanmar Students Learn Thai — Smarter</p>
+    <p id="greeting">Helping Myanmar Students Learn Thai — Smarter</p>
   </header>
+
+  <div class="settings-area">
+    <select onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="mm">Myanmar</option>
+      <option value="th">Thai</option>
+    </select>
+    <select onchange="setTheme(this.value)">
+      <option value="default">Main Theme</option>
+      <option value="dark">Dark Theme</option>
+      <option value="colorblind">Color Blind</option>
+      <option value="autism">Autism Friendly</option>
+      <option value="pride">Pride Theme</option>
+    </select>
+  </div>
 
   <section class="chat-container">
     <div id="chat-log">
-      <div class="message">🤖 สวัสดีค่ะ (Sawasdee ka!) Welcome! I am your AI Concierge for the OKay Thai Language Center. How can I help you today?</div>
+      <div class="message" id="welcome-msg"></div>
     </div>
 
     <div class="input-area">
@@ -102,6 +147,30 @@
 
   <script>
     const chatLog = document.getElementById('chat-log');
+    const welcomeMsg = document.getElementById('welcome-msg');
+
+    const messages = {
+      en: "🤖 Hello! I am your AI Concierge for OKay Thai. How can I assist you today?",
+      mm: "🤖 မင်္ဂလာပါ။ OKay Thai မှ AI Concierge ဖြစ်ပါတယ်။ ဘာဝန်ဆောင်မှုလိုပါသလဲ။",
+      th: "🤖 สวัสดีค่ะ! ฉันคือ AI ผู้ช่วยของคุณจาก OKay Thai มีอะไรให้ช่วยไหมคะ?"
+    };
+
+    function setLanguage(lang) {
+      localStorage.setItem('lang', lang);
+      welcomeMsg.innerText = messages[lang];
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+
+    window.onload = () => {
+      const lang = localStorage.getItem('lang') || 'en';
+      const theme = localStorage.getItem('theme') || 'default';
+      setLanguage(lang);
+      setTheme(theme);
+    };
 
     function appendMessage(message, sender = 'ai') {
       const div = document.createElement('div');
